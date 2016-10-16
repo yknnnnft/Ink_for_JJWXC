@@ -4,6 +4,7 @@
 // @include     http://bbs.jjwxc.net/showmsg.php*
 // @version     1
 // @grant       GM_addStyle
+// @updateURL   https://openuserjs.org/meta/yknnnnft/INK_FOR_JJWXC.meta.js
 // ==/UserScript==
 
 (function() {
