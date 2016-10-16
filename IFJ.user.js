@@ -2,7 +2,8 @@
 // @name        INK_FOR_JJWXC
 // @namespace   ifj.tryclear
 // @include     http://bbs.jjwxc.net/showmsg.php*
-// @version     1
+// @exclude     http://bbs.jjwxc.net/board.php?board=36*
+// @version     1.0.0
 // @grant       GM_addStyle
 // @updateURL   https://openuserjs.org/meta/yknnnnft/INK_FOR_JJWXC.meta.js
 // ==/UserScript==
