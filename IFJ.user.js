@@ -2,8 +2,10 @@
 // @name        INK_FOR_JJWXC
 // @namespace   ifj.tryclear
 // @include     http://bbs.jjwxc.net/showmsg.php*
-// @exclude     http://bbs.jjwxc.net/board.php?board=36*
-// @version     1.1.0
+// @include     http://bbs.jjwxc.com/showmsg.php*
+// @exclude     http://bbs.jjwxc.net/showmsg.php?board=36*
+// @exclude     http://bbs.jjwxc.com/showmsg.php?board=36*
+// @version     1.1.1
 // @grant       GM_addStyle
 // @updateURL   https://openuserjs.org/meta/yknnnnft/INK_FOR_JJWXC.meta.js
 // ==/UserScript==
@@ -51,7 +53,6 @@
 		CANCEL_BUTTON_TEXT : '取消',
 	};
 	initialRestrictionSettings();
-	console.log(RESTRICTION.BGCOLOR);
 	var CSSSTRING = '.repalceTd { background-color: ' + RESTRICTION.BGCOLOR + '; opacity: 0.6; cursor: pointer; } '
 					+ '.spanHideBtn { vertical-align: top; text-decoration: underline; float: right; cursor: pointer; }'
 					+ '#divInkRestrIcon { position: fixed; width: 40px; height: 40px; background-color: RGB(238, 250, 238); '
@@ -87,7 +88,8 @@
 	}
 	function checkMain(trs) {
 		var $topic = $(SELECTOR.REPLY_TOPIC, trs[CONSTANTS.ORDER_NUMBER_OF_TOPIC])[0];
-		if ($topic === null) {
+		console.log($topic);
+		if ($topic === undefined) {
 			return false;
 		}
 		return _checkHeight($topic) || _checkTextLength($topic) || _checkLinebreak($topic) || _checkProhibitedWord($topic);
