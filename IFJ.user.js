@@ -3,7 +3,7 @@
 // @namespace   ifj.tryclear
 // @include     http://bbs.jjwxc.net/showmsg.php*
 // @exclude     http://bbs.jjwxc.net/board.php?board=36*
-// @version     1.0.0
+// @version     1.1.0
 // @grant       GM_addStyle
 // @updateURL   https://openuserjs.org/meta/yknnnnft/INK_FOR_JJWXC.meta.js
 // ==/UserScript==
@@ -11,7 +11,13 @@
 (function() {
 	    'use strict';
 
-	var RESTRICTION;
+	var RESTRICTION = {
+		'CUSTOMHEIGHT' : 0,
+		'CHAR' : 0,
+		'LINEBREAK' : 0,
+		'PROHIBIT_WORD' : [],
+		'BGCOLOR' : '#EEFAEE',
+	};
 	var ALERT_MSG = {
 		OVERALL : '该回复被隐藏',
 		HEIGHT : 'OVER HEIGHT',
@@ -40,13 +46,17 @@
 		LABEL_CHAR_TEXT : '字数(0:关闭)',
 		LABEL_LB_TEXT : '换行(0:关闭)',
 		LABEL_KEYWORD_TEXT : '关键字(以半角“,”分隔)',
+		LABEL_BGCOLOR_TEXT : '背景色',
 		CONFIRM_BUTTON_TEXT : '确认',
 		CANCEL_BUTTON_TEXT : '取消',
 	};
-	var CSSSTRING = '.repalceTd { background-color: RGB(238, 250, 238); opacity: 0.6; cursor: pointer; } '
+	initialRestrictionSettings();
+	console.log(RESTRICTION.BGCOLOR);
+	var CSSSTRING = '.repalceTd { background-color: ' + RESTRICTION.BGCOLOR + '; opacity: 0.6; cursor: pointer; } '
 					+ '.spanHideBtn { vertical-align: top; text-decoration: underline; float: right; cursor: pointer; }'
 					+ '#divInkRestrIcon { position: fixed; width: 40px; height: 40px; background-color: RGB(238, 250, 238); '
-					+ 'top: 20px; left: 20px; border-radius: 4px; opacity: 0.4; padding: 5px; cursor: pointer; '
+					+ 'top: 20px; left: 20px; border-radius: 4px; opacity: 0.4; padding: 5px; cursor: pointer; ' 
+					+ '-moz-user-select: none; -webkit-user-select:none; '
 					+ 'font-style: oblique; font-size: 15px; font-weight: bolder; line-height: 40px; text-align: center; } '
 					+ '#divInkRestrIcon:hover { opacity: 1.0 } ' 
 					+ '#divInkRestrPanel { position: fixed; background: RGB(238, 250, 238); '
@@ -54,10 +64,9 @@
 					+ '#divInkRestrPanel input { display: block; } '
 					+ '.btnInkRestr { margin: 10px } '
 					+ '.iptInkRestrNumber { ime-mode: disabled; } ';
-	var classIdOfReplies = new Set();
 	GM_addStyle(CSSSTRING);
-	initialRestrictionSettings();
 	makeSettingPanel();
+	var classIdOfReplies = new Set();
 	initialSetOfReplies();
 	classIdOfReplies.forEach(function(val, key, self) {
 		var $trs = $(CONSTANTS.CHAR_POINT + val);
@@ -140,22 +149,20 @@
 		var objRestriction;
 		try {
 			objRestriction = JSON.parse(sRestriction);
-			if (!objRestriction.hasOwnProperty('CUSTOMHEIGHT') || !objRestriction.hasOwnProperty('CHAR') || 
-				!objRestriction.hasOwnProperty('LINEBREAK') || !objRestriction.hasOwnProperty('PROHIBIT_WORD')) {
-				throw 'incorrectly defined localStorage!';
+			console.log(objRestriction);
+			if (objRestriction === null) {
+				throw 'not correctly defined Restrictions';
+			}
+			for (let item in RESTRICTION) {
+				if (objRestriction.hasOwnProperty(item) ) {
+					RESTRICTION[item] = objRestriction[item];
+				}
 			}
 		}
 		catch(e) {
 			console.log(e);
-			objRestriction = {
-				'CUSTOMHEIGHT' : 0,
-				'CHAR' : 0,
-				'LINEBREAK' : 0,
-				'PROHIBIT_WORD' : [],
-			};
 		}
-		localStorage.setItem(CONSTANTS.LOCAL_STORAGE_ITEMID, JSON.stringify(objRestriction));
-		RESTRICTION = objRestriction;
+		localStorage.setItem(CONSTANTS.LOCAL_STORAGE_ITEMID, JSON.stringify(RESTRICTION));
 		return;
 	}
 	function initialSetOfReplies() {
@@ -186,10 +193,14 @@
 		var iptChar = _makeInputSet(CONSTANTS.LABEL_CHAR_TEXT, CONSTANTS.NUMBER_SETTING_CLASS);
 		var iptLineBreak = _makeInputSet(CONSTANTS.LABEL_LB_TEXT, CONSTANTS.NUMBER_SETTING_CLASS);
 		var iptProhibtedWord = _makeInputSet(CONSTANTS.LABEL_KEYWORD_TEXT, CONSTANTS.TEXT_SETTING_CLASS);
+		var iptBGColor = _makeInputSet(CONSTANTS.LABEL_BGCOLOR_TEXT, CONSTANTS.TEXT_SETTING_CLASS);
 		iptHeight.value = RESTRICTION.CUSTOMHEIGHT;
 		iptChar.value = RESTRICTION.CHAR;
 		iptLineBreak.value = RESTRICTION.LINEBREAK;
 		iptProhibtedWord.value = RESTRICTION.PROHIBIT_WORD.join(CONSTANTS.CHAR_COMMA);
+		iptBGColor.setAttribute('type', 'color');
+		iptBGColor.value = RESTRICTION.BGCOLOR;
+
 
 		var btnConfirm = document.createElement('button');
 		btnConfirm.setAttribute('type', 'button');
@@ -208,6 +219,8 @@
 			objRestr.CHAR = parseInt(iptChar.value) || 0;
 			objRestr.LINEBREAK = parseInt(iptLineBreak.value) || 0;
 			objRestr.PROHIBIT_WORD = iptProhibtedWord.value === '' ? [] : iptProhibtedWord.value.split(CONSTANTS.CHAR_COMMA);
+			objRestr.BGCOLOR = iptBGColor.value || '#EEFAEE';
+			console.log(iptBGColor.value);
 			localStorage.setItem(CONSTANTS.LOCAL_STORAGE_ITEMID, JSON.stringify(objRestr));
 			document.location.reload();
 		});
