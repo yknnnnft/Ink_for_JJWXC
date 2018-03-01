@@ -8,6 +8,7 @@
 // @version     1.1.2
 // @grant       GM_addStyle
 // @updateURL   https://openuserjs.org/meta/yknnnnft/INK_FOR_JJWXC.meta.js
+// @license     The MIT License (MIT)
 // ==/UserScript==
 
 (function() {
